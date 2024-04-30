@@ -5,6 +5,8 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
 
@@ -19,16 +21,16 @@ export class UrlEntity {
   @Column({ name: 'short_url', length: 30, nullable: false })
   shortUrl: string;
 
-  @Column({ name: 'clicks' })
+  @Column({ name: 'clicks', nullable: true })
   clicks: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 
-  @CreateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: string;
 
-  @CreateDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: string;
 
   @OneToOne(() => UserEntity, { cascade: true, nullable: true })
