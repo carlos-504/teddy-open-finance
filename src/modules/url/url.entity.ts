@@ -31,7 +31,7 @@ export class UrlEntity {
   @CreateDateColumn({ name: 'deleted_at' })
   deletedAt: string;
 
-  @OneToOne(() => UserEntity, { cascade: true })
+  @OneToOne(() => UserEntity, { cascade: true, nullable: true })
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
 }
