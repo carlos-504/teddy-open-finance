@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, IsNull, Not } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UrlEntity } from './url.entity';
 import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
@@ -40,7 +40,7 @@ export class UrlService {
   async findAndCountClickUrl(shortUrl: string) {
     try {
       const url = await this.urlRepository.findOne({
-        where: { shortUrl },
+        where: { shortUrl, deletedAt: IsNull() },
       });
 
       if (!url) {
@@ -58,7 +58,7 @@ export class UrlService {
 
   async listActiveUrls() {
     const urls = await this.urlRepository.find({
-      where: { deletedAt: Not(IsNull()) },
+      where: { deletedAt: IsNull() },
     });
 
     if (!urls.length) {
@@ -70,7 +70,10 @@ export class UrlService {
 
   async updateUrl(idUrl: string, urlData: UpdateUrlDTO) {
     try {
-      const url = await this.urlRepository.findOneBy({ id: idUrl });
+      const url = await this.urlRepository.findOneBy({
+        id: idUrl,
+        deletedAt: IsNull(),
+      });
 
       if (!url) {
         throw new NotFoundException('url was not found');
@@ -82,13 +85,31 @@ export class UrlService {
       )}/${shortCode}`;
 
       const newUrl = this.urlRepository.save({
+        id: url.id,
         originalUrl: urlData.url,
         shortUrl,
       });
 
       return newUrl;
     } catch (err) {
-      throw new BadRequestException('error updating url');
+      throw new BadRequestException(err?.message);
+    }
+  }
+
+  async deleteUrl(idUrl: string) {
+    const url = await this.urlRepository.findOneBy({
+      id: idUrl,
+      deletedAt: IsNull(),
+    });
+
+    if (!url) {
+      throw new NotFoundException('url was not found');
+    }
+
+    const deleteResult = await this.urlRepository.softDelete(idUrl);
+
+    if (deleteResult.affected === 0) {
+      throw new BadRequestException('unable to delete url');
     }
   }
 }

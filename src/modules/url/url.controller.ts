@@ -8,6 +8,7 @@ import {
   ConsoleLogger,
   Put,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UrlService } from './url.service';
@@ -62,6 +63,17 @@ export class UrlController {
       };
     } catch (err) {
       this.nativeLogger.error(err);
+    }
+  }
+
+  @Delete(':id')
+  async DeleteResult(@Param('id') urlId: string) {
+    try {
+      await this.urlService.deleteUrl(urlId);
+
+      return { message: 'url successfully deleted' };
+    } catch (err) {
+      throw err;
     }
   }
 }
