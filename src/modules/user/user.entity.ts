@@ -1,14 +1,17 @@
+// import { Exclude } from 'class-transformer';
 import {
   Entity,
   Column,
   CreateDateColumn,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import { UrlEntity } from '../url/url.entity';
 
 @Entity({ name: 'users' })
 export class UserEntity {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({ name: 'name', length: 100, nullable: false })
   name: string;
@@ -16,6 +19,7 @@ export class UserEntity {
   @Column({ name: 'email', length: 70, nullable: false })
   email: string;
 
+  // @Exclude()
   @Column({ name: 'password', length: 255, nullable: false })
   password: string;
 
@@ -27,4 +31,7 @@ export class UserEntity {
 
   @CreateDateColumn({ name: 'deleted_at' })
   deletedAt: string;
+
+  @OneToMany(() => UrlEntity, (url) => url.user)
+  urls: UrlEntity[];
 }

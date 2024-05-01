@@ -3,17 +3,18 @@ import {
   Column,
   CreateDateColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
   JoinColumn,
   DeleteDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'urls' })
 export class UrlEntity {
   @PrimaryGeneratedColumn('increment')
-  id: string;
+  id: number;
 
   @Column({ name: 'original_url', length: 255, nullable: false })
   originalUrl: string;
@@ -24,16 +25,20 @@ export class UrlEntity {
   @Column({ name: 'clicks', nullable: true, default: 0 })
   clicks: number;
 
+  @Column({ name: 'user_id', nullable: true })
+  userId: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 
   @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: string;
 
+  @Exclude()
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: string;
 
-  @OneToOne(() => UserEntity, { cascade: true, nullable: true })
-  @JoinColumn({ name: 'userId' })
+  @ManyToOne(() => UserEntity, (user) => user.urls)
+  @JoinColumn({ name: 'user_id' })
   user: UserEntity;
 }

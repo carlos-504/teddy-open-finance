@@ -7,17 +7,28 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from 'src/utils/public-route';
 
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
     const req = context.switchToHttp().getRequest<UserReq>();
     const token = this.getTokenHeader(req);
 
+    if (isPublic && !token) {
+      return true;
+    }
+
     if (!token) {
-      throw new UnauthorizedException('');
+      throw new UnauthorizedException('authentication failed');
     }
 
     await this.validToken(token, req);

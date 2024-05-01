@@ -1,15 +1,18 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
+  // Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UrlEntity } from './url.entity';
-import { ShortenUrlDTO } from './dto/shorten-url.dto';
 import * as shortid from 'shortid';
-import { UpdateUrlDTO } from './dto/update-url.dto';
+import { CreateOrUpdateUrlInt } from './interfaces/url.interface';
+import { UserReq } from '../authentication/interfaces/authentication.interface';
+import { REQUEST } from '@nestjs/core';
 
 @Injectable()
 export class UrlService {
@@ -17,12 +20,13 @@ export class UrlService {
     @InjectRepository(UrlEntity)
     private readonly urlRepository: Repository<UrlEntity>,
     private configService: ConfigService,
+    @Inject(REQUEST) private readonly request: UserReq,
   ) {}
 
-  async shortenUrl(urlData: ShortenUrlDTO) {
+  async shortenUrl(urlData: CreateOrUpdateUrlInt) {
     try {
-      const { url } = urlData;
-      const urlCreated = this.createOrUpdateUrl({ url });
+      const { url, userId } = urlData;
+      const urlCreated = await this.createOrUpdateUrl({ url, userId });
 
       return urlCreated;
     } catch (err) {
@@ -54,8 +58,9 @@ export class UrlService {
   }
 
   async listActiveUrls() {
+    const userId = this.request.user.sub;
     const urls = await this.urlRepository.find({
-      where: { deletedAt: IsNull() },
+      where: { deletedAt: IsNull(), userId },
     });
 
     if (!urls.length) {
@@ -65,20 +70,25 @@ export class UrlService {
     return urls;
   }
 
-  async updateUrl(idUrl: string, urlData: UpdateUrlDTO) {
+  async updateUrl(urlData: CreateOrUpdateUrlInt) {
     try {
-      const url = await this.urlRepository.findOneBy({
-        id: idUrl,
+      const { id, url, userId } = urlData;
+      const findUrl = await this.urlRepository.findOneBy({
+        id: parseInt(id),
         deletedAt: IsNull(),
+        userId,
       });
 
-      if (!url) {
+      if (!findUrl) {
         throw new NotFoundException('url was not found');
       }
 
-      Object.assign(urlData, url);
-
-      const newUrl = this.createOrUpdateUrl(urlData as ShortenUrlDTO);
+      const newUrl = await this.createOrUpdateUrl({
+        url,
+        id,
+        userId,
+        clicks: findUrl.clicks,
+      });
 
       return newUrl;
     } catch (err) {
@@ -86,18 +96,20 @@ export class UrlService {
     }
   }
 
-  async deleteUrl(idUrl: string) {
+  async deleteUrl(urlId: string) {
     try {
+      const userId = this.request.user.sub;
       const url = await this.urlRepository.findOneBy({
-        id: idUrl,
+        id: parseInt(urlId),
         deletedAt: IsNull(),
+        userId,
       });
 
       if (!url) {
         throw new NotFoundException('url was not found');
       }
 
-      const deleteResult = await this.urlRepository.softDelete(idUrl);
+      const deleteResult = await this.urlRepository.softDelete(urlId);
 
       if (deleteResult.affected === 0) {
         throw new BadRequestException('unable to delete url');
@@ -107,22 +119,27 @@ export class UrlService {
     }
   }
 
-  private async createOrUpdateUrl(url: ShortenUrlDTO) {
+  private async createOrUpdateUrl(urlData: CreateOrUpdateUrlInt) {
     const shortCode = shortid.generate().substring(0, 6);
     const shortUrl = `${this.configService.get<string>(
       'SHORT_BASE_URL',
     )}/${shortCode}`;
 
-    if (url.id) {
+    const { url, userId, id, clicks } = urlData;
+
+    if (id) {
       return this.urlRepository.save({
-        id: url.id,
-        originalUrl: url.url,
+        id: parseInt(id),
+        originalUrl: url,
         shortUrl,
+        userId: userId,
+        clicks,
       });
     } else {
       return this.urlRepository.save({
-        originalUrl: url.url,
+        originalUrl: url,
         shortUrl,
+        userId: userId,
       });
     }
   }

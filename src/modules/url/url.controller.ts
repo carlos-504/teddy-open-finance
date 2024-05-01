@@ -5,6 +5,7 @@ import {
   Post,
   Query,
   Res,
+  Req,
   Put,
   Param,
   Delete,
@@ -13,17 +14,22 @@ import {
 import { Response } from 'express';
 import { UrlService } from './url.service';
 import { UpdateUrlDTO } from './dto/update-url.dto';
-import { AuthenticationGuard } from '../authentication/authentication.guard';
 import { ShortenUrlDTO } from './dto/shorten-url.dto';
+import { AuthenticationGuard } from '../authentication/authentication.guard';
+import { UserReq } from '../authentication/interfaces/authentication.interface';
+import { Public } from 'src/utils/public-route';
 
+@UseGuards(AuthenticationGuard)
 @Controller('url')
 export class UrlController {
   constructor(private urlService: UrlService) {}
 
+  @Public()
   @Post()
-  async shortenUrl(@Body() urlData: ShortenUrlDTO) {
+  async shortenUrl(@Req() req: UserReq, @Body() urlData: ShortenUrlDTO) {
     try {
-      const url = await this.urlService.shortenUrl(urlData);
+      const userId = req.user ? req.user.sub : null;
+      const url = await this.urlService.shortenUrl({ ...urlData, userId });
 
       return {
         data: url,
@@ -34,6 +40,7 @@ export class UrlController {
     }
   }
 
+  @Public()
   @Get('redirect')
   async redirectShorUrlAndCountClick(
     @Query('url') shortUrl: string,
@@ -48,7 +55,6 @@ export class UrlController {
     }
   }
 
-  @UseGuards(AuthenticationGuard)
   @Get()
   async getActiveUrls() {
     try {
@@ -60,11 +66,19 @@ export class UrlController {
     }
   }
 
-  @UseGuards(AuthenticationGuard)
   @Put(':id')
-  async updateUrl(@Param('id') urlId: string, @Body() urlData: UpdateUrlDTO) {
+  async updateUrl(
+    @Req() req: UserReq,
+    @Param('id') urlId: string,
+    @Body() urlData: UpdateUrlDTO,
+  ) {
     try {
-      const url = await this.urlService.updateUrl(urlId, urlData);
+      const userId = req.user.sub;
+      const url = await this.urlService.updateUrl({
+        userId,
+        url: urlData.url,
+        id: urlId,
+      });
 
       return {
         data: url,
@@ -75,7 +89,6 @@ export class UrlController {
     }
   }
 
-  @UseGuards(AuthenticationGuard)
   @Delete(':id')
   async DeleteResult(@Param('id') urlId: string) {
     try {
