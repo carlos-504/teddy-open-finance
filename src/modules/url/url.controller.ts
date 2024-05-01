@@ -8,11 +8,13 @@ import {
   Put,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UrlService } from './url.service';
-import { ShortenUrlDTO } from './dto/shorten-url.dto';
 import { UpdateUrlDTO } from './dto/update-url.dto';
+import { AuthenticationGuard } from '../authentication/authentication.guard';
+import { ShortenUrlDTO } from './dto/shorten-url.dto';
 
 @Controller('url')
 export class UrlController {
@@ -46,6 +48,7 @@ export class UrlController {
     }
   }
 
+  @UseGuards(AuthenticationGuard)
   @Get()
   async getActiveUrls() {
     try {
@@ -57,6 +60,7 @@ export class UrlController {
     }
   }
 
+  @UseGuards(AuthenticationGuard)
   @Put(':id')
   async updateUrl(@Param('id') urlId: string, @Body() urlData: UpdateUrlDTO) {
     try {
@@ -71,6 +75,7 @@ export class UrlController {
     }
   }
 
+  @UseGuards(AuthenticationGuard)
   @Delete(':id')
   async DeleteResult(@Param('id') urlId: string) {
     try {
