@@ -28,7 +28,8 @@ export class UrlController {
       const url = await this.urlService.shortenUrl(urlData);
 
       return {
-        message: url,
+        data: url,
+        message: 'url shortened successfully',
       };
     } catch (err) {
       throw err;
@@ -54,7 +55,7 @@ export class UrlController {
     try {
       const urls = await this.urlService.listActiveUrls();
 
-      return urls;
+      return { data: urls, message: 'url listed successfully' };
     } catch (err) {
       throw err;
     }
@@ -66,7 +67,7 @@ export class UrlController {
       const url = await this.urlService.updateUrl(urlId, urlData);
 
       return {
-        url,
+        data: url,
         message: 'url updated successfully',
       };
     } catch (err) {
@@ -79,7 +80,7 @@ export class UrlController {
     try {
       await this.urlService.deleteUrl(urlId);
 
-      return { message: 'url successfully deleted' };
+      return { data: null, message: 'url successfully deleted' };
     } catch (err) {
       throw err;
     }
