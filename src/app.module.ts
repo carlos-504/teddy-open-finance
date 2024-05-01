@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UrlModule } from './modules/url/url.module';
 import { UserModule } from './modules/user/user.module';
 import { PostgresConfigService } from './config/postgres.config.service';
-import { GlobalException } from './resources/global-exception';
+import { GlobalException } from './resources/filters/global-exception.filter';
 
 @Module({
   imports: [
