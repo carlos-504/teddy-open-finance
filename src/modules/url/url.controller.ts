@@ -17,10 +17,7 @@ import { UpdateUrlDTO } from './dto/UpdateUrl.dto';
 
 @Controller('url')
 export class UrlController {
-  constructor(
-    private urlService: UrlService,
-    private nativeLogger: ConsoleLogger,
-  ) {}
+  constructor(private urlService: UrlService) {}
 
   @Post()
   async shortenUrl(@Body() urlData: ShortenUrlDTO) {
@@ -71,7 +68,7 @@ export class UrlController {
         message: 'url updated successfully',
       };
     } catch (err) {
-      this.nativeLogger.error(err);
+      throw err;
     }
   }
 
