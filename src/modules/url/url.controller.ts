@@ -24,11 +24,15 @@ export class UrlController {
 
   @Post()
   async shortenUrl(@Body() urlData: ShortenUrlDTO) {
-    const url = await this.urlService.shortenUrl(urlData);
+    try {
+      const url = await this.urlService.shortenUrl(urlData);
 
-    return {
-      message: url,
-    };
+      return {
+        message: url,
+      };
+    } catch (err) {
+      throw err;
+    }
   }
 
   @Get('redirect')
@@ -41,15 +45,19 @@ export class UrlController {
 
       resp.redirect(url);
     } catch (err) {
-      this.nativeLogger.error(err);
+      throw err;
     }
   }
 
   @Get()
   async getActiveUrls() {
-    const urls = await this.urlService.listActiveUrls();
+    try {
+      const urls = await this.urlService.listActiveUrls();
 
-    return urls;
+      return urls;
+    } catch (err) {
+      throw err;
+    }
   }
 
   @Put(':id')

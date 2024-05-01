@@ -21,17 +21,10 @@ export class UrlService {
 
   async shortenUrl(urlData: ShortenUrlDTO) {
     try {
-      const shortCode = shortid.generate().substring(0, 6);
-      const shortUrl = `${this.configService.get<string>(
-        'SHORT_BASE_URL',
-      )}/${shortCode}`;
+      const { url } = urlData;
+      const urlCreated = this.createOrUpdateUrl({ url });
 
-      const url = this.urlRepository.save({
-        originalUrl: urlData.url,
-        shortUrl,
-      });
-
-      return url;
+      return urlCreated;
     } catch (err) {
       throw new BadRequestException('unable to shorten the url');
     }
@@ -48,11 +41,15 @@ export class UrlService {
       }
 
       url.clicks++;
-      this.urlRepository.save(url);
+      const urlUpdated = await this.urlRepository.update(url.id, url);
+
+      if (urlUpdated.affected === 0) {
+        throw new BadRequestException('unable to redirect to url');
+      }
 
       return url.originalUrl;
     } catch (err) {
-      throw new BadRequestException('unable to redirect to url');
+      throw err;
     }
   }
 
@@ -79,37 +76,54 @@ export class UrlService {
         throw new NotFoundException('url was not found');
       }
 
-      const shortCode = shortid.generate().substring(0, 6);
-      const shortUrl = `${this.configService.get<string>(
-        'SHORT_BASE_URL',
-      )}/${shortCode}`;
+      Object.assign(urlData, url);
 
-      const newUrl = this.urlRepository.save({
-        id: url.id,
-        originalUrl: urlData.url,
-        shortUrl,
-      });
+      const newUrl = this.createOrUpdateUrl(urlData as ShortenUrlDTO);
 
       return newUrl;
     } catch (err) {
-      throw new BadRequestException(err?.message);
+      throw err;
     }
   }
 
   async deleteUrl(idUrl: string) {
-    const url = await this.urlRepository.findOneBy({
-      id: idUrl,
-      deletedAt: IsNull(),
-    });
+    try {
+      const url = await this.urlRepository.findOneBy({
+        id: idUrl,
+        deletedAt: IsNull(),
+      });
 
-    if (!url) {
-      throw new NotFoundException('url was not found');
+      if (!url) {
+        throw new NotFoundException('url was not found');
+      }
+
+      const deleteResult = await this.urlRepository.softDelete(idUrl);
+
+      if (deleteResult.affected === 0) {
+        throw new BadRequestException('unable to delete url');
+      }
+    } catch (err) {
+      throw err;
     }
+  }
 
-    const deleteResult = await this.urlRepository.softDelete(idUrl);
+  private async createOrUpdateUrl(url: ShortenUrlDTO) {
+    const shortCode = shortid.generate().substring(0, 6);
+    const shortUrl = `${this.configService.get<string>(
+      'SHORT_BASE_URL',
+    )}/${shortCode}`;
 
-    if (deleteResult.affected === 0) {
-      throw new BadRequestException('unable to delete url');
+    if (url.id) {
+      return this.urlRepository.save({
+        id: url.id,
+        originalUrl: url.url,
+        shortUrl,
+      });
+    } else {
+      return this.urlRepository.save({
+        originalUrl: url.url,
+        shortUrl,
+      });
     }
   }
 }

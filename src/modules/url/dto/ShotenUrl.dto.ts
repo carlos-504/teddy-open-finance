@@ -1,7 +1,7 @@
 import { IsUrl, IsNotEmpty } from 'class-validator';
 
 export class ShortenUrlDTO {
-  id: number;
+  id?: string;
 
   @IsUrl({ message: 'invalid URL' })
   @IsNotEmpty({ message: 'cannot be null' })
