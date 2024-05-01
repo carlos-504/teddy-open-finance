@@ -25,6 +25,7 @@ export class UrlEntity {
   @Column({ name: 'clicks', nullable: true, default: 0 })
   clicks: number;
 
+  @Exclude({ toPlainOnly: true })
   @Column({ name: 'user_id', nullable: true })
   userId: number;
 
@@ -34,7 +35,7 @@ export class UrlEntity {
   @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: string;
 
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: string;
 

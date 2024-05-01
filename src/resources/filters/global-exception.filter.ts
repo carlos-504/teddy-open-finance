@@ -16,7 +16,6 @@ export class GlobalException implements ExceptionFilter {
   ) {}
 
   catch(excpetion: unknown, host: ArgumentsHost) {
-    // nativeLogger.er('hahahaah', excpetion);
     this.nativeLogger.error(excpetion);
 
     const { httpAdapter } = this.adapterHost;

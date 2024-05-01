@@ -1,10 +1,12 @@
-// import { Exclude } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import {
   Entity,
   Column,
   CreateDateColumn,
   PrimaryGeneratedColumn,
   OneToMany,
+  UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { UrlEntity } from '../url/url.entity';
 
@@ -19,17 +21,17 @@ export class UserEntity {
   @Column({ name: 'email', length: 70, nullable: false })
   email: string;
 
-  // @Exclude()
+  @Exclude({ toPlainOnly: true })
   @Column({ name: 'password', length: 255, nullable: false })
   password: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: string;
 
-  @CreateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: 'updated_at', nullable: true })
   updatedAt: string;
 
-  @CreateDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deletedAt: string;
 
   @OneToMany(() => UrlEntity, (url) => url.user)

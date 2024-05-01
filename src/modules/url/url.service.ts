@@ -3,7 +3,6 @@ import {
   Inject,
   Injectable,
   NotFoundException,
-  // Req,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
@@ -20,7 +19,7 @@ export class UrlService {
     @InjectRepository(UrlEntity)
     private readonly urlRepository: Repository<UrlEntity>,
     private configService: ConfigService,
-    @Inject(REQUEST) private readonly request: UserReq,
+    @Inject(REQUEST) private readonly req: UserReq,
   ) {}
 
   async shortenUrl(urlData: CreateOrUpdateUrlInt) {
@@ -58,7 +57,7 @@ export class UrlService {
   }
 
   async listActiveUrls() {
-    const userId = this.request.user.sub;
+    const userId = this.req.user.sub;
     const urls = await this.urlRepository.find({
       where: { deletedAt: IsNull(), userId },
     });
@@ -98,7 +97,7 @@ export class UrlService {
 
   async deleteUrl(urlId: string) {
     try {
-      const userId = this.request.user.sub;
+      const userId = this.req.user.sub;
       const url = await this.urlRepository.findOneBy({
         id: parseInt(urlId),
         deletedAt: IsNull(),
