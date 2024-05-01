@@ -5,15 +5,14 @@ import {
   Post,
   Query,
   Res,
-  ConsoleLogger,
   Put,
   Param,
   Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UrlService } from './url.service';
-import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
-import { UpdateUrlDTO } from './dto/UpdateUrl.dto';
+import { ShortenUrlDTO } from './dto/shorten-url.dto';
+import { UpdateUrlDTO } from './dto/update-url.dto';
 
 @Controller('url')
 export class UrlController {

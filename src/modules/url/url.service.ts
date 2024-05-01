@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UrlEntity } from './url.entity';
-import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
+import { ShortenUrlDTO } from './dto/shorten-url.dto';
 import * as shortid from 'shortid';
-import { UpdateUrlDTO } from './dto/UpdateUrl.dto';
+import { UpdateUrlDTO } from './dto/update-url.dto';
 
 @Injectable()
 export class UrlService {
