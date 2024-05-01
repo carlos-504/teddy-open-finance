@@ -9,6 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { UrlEntity } from './url.entity';
 import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
 import * as shortid from 'shortid';
+import { UpdateUrlDTO } from './dto/UpdateUrl.dto';
 
 @Injectable()
 export class UrlService {
@@ -52,6 +53,30 @@ export class UrlService {
       return url.originalUrl;
     } catch (err) {
       throw new BadRequestException('unable to redirect to url');
+    }
+  }
+
+  async updateUrl(idUrl: string, urlData: UpdateUrlDTO) {
+    try {
+      const url = await this.urlRepository.findOneBy({ id: idUrl });
+
+      if (!url) {
+        throw new NotFoundException('url was not found');
+      }
+
+      const shortCode = shortid.generate().substring(0, 6);
+      const shortUrl = `${this.configService.get<string>(
+        'SHORT_BASE_URL',
+      )}/${shortCode}`;
+
+      const newUrl = this.urlRepository.save({
+        originalUrl: urlData.url,
+        shortUrl,
+      });
+
+      return newUrl;
+    } catch (err) {
+      throw new BadRequestException('error updating url');
     }
   }
 }

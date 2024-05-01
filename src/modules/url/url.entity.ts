@@ -21,7 +21,7 @@ export class UrlEntity {
   @Column({ name: 'short_url', length: 30, nullable: false })
   shortUrl: string;
 
-  @Column({ name: 'clicks', nullable: true })
+  @Column({ name: 'clicks', nullable: true, default: 0 })
   clicks: number;
 
   @CreateDateColumn({ name: 'created_at' })

@@ -6,10 +6,13 @@ import {
   Query,
   Res,
   ConsoleLogger,
+  Put,
+  Param,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UrlService } from './url.service';
 import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
+import { UpdateUrlDTO } from './dto/UpdateUrl.dto';
 
 @Controller('url')
 export class UrlController {
@@ -36,6 +39,20 @@ export class UrlController {
       const url = await this.urlService.findAndCountClickUrl(shortUrl);
 
       resp.redirect(url);
+    } catch (err) {
+      this.nativeLogger.error(err);
+    }
+  }
+
+  @Put(':id')
+  async updateUrl(@Param('id') urlId: string, @Body() urlData: UpdateUrlDTO) {
+    try {
+      const url = await this.urlService.updateUrl(urlId, urlData);
+
+      return {
+        url,
+        message: 'url updated successfully',
+      };
     } catch (err) {
       this.nativeLogger.error(err);
     }
