@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull, Not } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UrlEntity } from './url.entity';
 import { ShortenUrlDTO } from './dto/ShotenUrl.dto';
@@ -54,6 +54,18 @@ export class UrlService {
     } catch (err) {
       throw new BadRequestException('unable to redirect to url');
     }
+  }
+
+  async listActiveUrls() {
+    const urls = await this.urlRepository.find({
+      where: { deletedAt: Not(IsNull()) },
+    });
+
+    if (!urls.length) {
+      throw new NotFoundException('no urls found');
+    }
+
+    return urls;
   }
 
   async updateUrl(idUrl: string, urlData: UpdateUrlDTO) {

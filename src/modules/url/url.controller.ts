@@ -44,6 +44,13 @@ export class UrlController {
     }
   }
 
+  @Get()
+  async getActiveUrls() {
+    const urls = await this.urlService.listActiveUrls();
+
+    return urls;
+  }
+
   @Put(':id')
   async updateUrl(@Param('id') urlId: string, @Body() urlData: UpdateUrlDTO) {
     try {

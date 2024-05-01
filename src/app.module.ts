@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostgresConfigService } from './config/postgres.config.service';
-import { UserModule } from './modules/user/user.module';
 import { UrlModule } from './modules/url/url.module';
+import { UserModule } from './modules/user/user.module';
+import { PostgresConfigService } from './config/postgres.config.service';
+import { GlobalException } from './resources/global-exception';
 
 @Module({
   imports: [
@@ -18,6 +20,12 @@ import { UrlModule } from './modules/url/url.module';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: GlobalException,
+    },
+    ConsoleLogger,
+  ],
 })
 export class AppModule {}
