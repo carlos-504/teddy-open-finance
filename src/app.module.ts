@@ -6,6 +6,7 @@ import { UrlModule } from './modules/url/url.module';
 import { UserModule } from './modules/user/user.module';
 import { PostgresConfigService } from './config/postgres.config.service';
 import { GlobalException } from './resources/filters/global-exception.filter';
+import { AuthenticationModule } from './modules/authentication/authentication.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { GlobalException } from './resources/filters/global-exception.filter';
       useClass: PostgresConfigService,
       inject: [PostgresConfigService],
     }),
+    AuthenticationModule,
   ],
   controllers: [],
   providers: [

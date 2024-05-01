@@ -9,6 +9,6 @@ import { UniqueEmailValidator } from '../../utils/unique-email-validator';
   imports: [TypeOrmModule.forFeature([UserEntity, UserEntity])],
   controllers: [UserController],
   providers: [UserService, UniqueEmailValidator],
-  exports: [],
+  exports: [UserService],
 })
 export class UserModule {}
