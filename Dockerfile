@@ -2,6 +2,8 @@ FROM node:17
 
 WORKDIR /app
 
+ENV TZ=America/Sao_Paulo
+
 COPY package*.json ./
 
 RUN npm install

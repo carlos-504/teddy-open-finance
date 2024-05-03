@@ -29,14 +29,14 @@ export class UrlEntity {
   @Column({ name: 'user_id', nullable: true })
   userId: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: string;
 
-  @UpdateDateColumn({ name: 'updated_at', nullable: true })
+  @UpdateDateColumn({ name: 'updated_at', nullable: true, type: 'timestamptz' })
   updatedAt: string;
 
   @Exclude({ toPlainOnly: true })
-  @DeleteDateColumn({ name: 'deleted_at', nullable: true })
+  @DeleteDateColumn({ name: 'deleted_at', nullable: true, type: 'timestamptz' })
   deletedAt: string;
 
   @ManyToOne(() => UserEntity, (user) => user.urls)
