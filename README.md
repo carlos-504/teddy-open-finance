@@ -1,73 +1,59 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# TEDDY-OPEN-FINANCE-API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Descrição
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A API é uma aplicação RESTful desenvolvida em Node.js 17, utilizando o framework NestJS e o ORM TypeORM para interagir com um banco de dados PostgreSQL. O principal propósito da API é encurtar e gerenciar URLs, permitindo operações CRUD (Create, Read, Update, Delete) sobre elas, além de fornecer funcionalidades para criação de usuários e autenticação. 
+A API segue uma arquitetura modular e escalável, baseada em conceitos de injeção de dependência e separação de preocupações. Utiliza os padrões de design RESTful para definir endpoints e manipular recursos de forma eficiente. Além disso, adota práticas de segurança recomendadas, como autenticação de usuário com tokens JWT (JSON Web Tokens) para proteger rotas sensíveis.
 
-## Description
+## Pré-requisitos para o setup:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Baixe na sua máquina as seguintes dependências:
 
-## Installation
+- Docker
+- Docker compose
 
-```bash
-$ npm install
+## Instalação
+
+1. Baixe o diretório para sua máquina
+
+```
+git clone https://github.com/carlos-504/clear-sale-challenge.git
 ```
 
-## Running the app
+2. Crie o arquivo de variáveis (.env) e copie o conteúdo dos arquivos .env.example para o mesmo
 
-```bash
-# development
-$ npm run start
+3. Para iniciar a aplicação
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+docker compose up
 ```
 
-## Test
+## REST API
 
-```bash
-# unit tests
-$ npm run test
+O sistema conta com uma API para realizar os CRUDS. A API segue o protocolo Rest de comunicação,
+onde é possível realizar uma comunicação com o servidor para obter, incluir ou remover.
 
-# e2e tests
-$ npm run test:e2e
+**Obs.:** Ao utilizar a API, envie sempre os cabeçalhos obrigatórios:
 
-# test coverage
-$ npm run test:cov
-```
+    "Accept: application/json
+    "Content-Type: application/json"
 
-## Support
+### API Endpoints
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Ação                                                  | Método de requisição | Endpoint        | Request Body                                  | Retorno                                            |
+| ----------------------------------------------------- | -------------------- | --------------- | --------------------------------------------- | -------------------------------------------------- |
+| Encurta e insere uma url na base de dados             | POST                 | /url            | url: string                                   | nova url inserida e encurtada                      |
+| Lista de urls                                         | GET (Auth Bearer)    | /url            |                                               | lista de urls cadastradas pelo usuário autenticado |
+| Redireciona para a url original e contabiliza o click | GET (Auth Bearer)    | /url/redirect   |                                               | null                                               |
+| Atualiza url do usuário                               | PUT (Auth Bearer)    | /url/{id}       | url: string                                   | url do usuário atualizado                          |
+| Exclui logicamente uma url                            | DELETE (Auth Bearer) | /url/{id}       |                                               | mensagem de sucesso                                |
+| Cria um usuário                                       | POST                 | /user           | name: string, email: string, password: string | usuário inserido                                   |
+| Autentica um usuário                                  | POST                 | /authentication | email: string, password: string               | token JWT                                          |
 
-## Stay in touch
+### Link da documentação Swagger
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+http://localhost:3000/api
 
-## License
+### Arquivos importantes
 
-Nest is [MIT licensed](LICENSE).
+Use o Insomnia_2024-05-03.json (raiz do diretório) em seu ambiente de testes para criar o diretórios com os endpoint
