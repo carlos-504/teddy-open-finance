@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './user.entity';
 import { UserController } from './user.controller';
@@ -8,7 +8,7 @@ import { UniqueEmailValidator } from '../../utils/unique-email-validator';
 @Module({
   imports: [TypeOrmModule.forFeature([UserEntity, UserEntity])],
   controllers: [UserController],
-  providers: [UserService, UniqueEmailValidator],
+  providers: [UserService, UniqueEmailValidator, ConsoleLogger],
   exports: [UserService],
 })
 export class UserModule {}

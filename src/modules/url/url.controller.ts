@@ -19,6 +19,7 @@ import { AuthenticationGuard } from '../authentication/authentication.guard';
 import { UserReq } from '../authentication/interfaces/authentication.interface';
 import { Public } from 'src/utils/public-route';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Log } from 'src/utils/request-logs';
 
 @ApiBearerAuth()
 @ApiTags('URL')
@@ -29,7 +30,11 @@ export class UrlController {
 
   @Public()
   @Post()
-  async shortenUrl(@Req() req: UserReq, @Body() urlData: ShortenUrlDTO) {
+  async shortenUrl(
+    @Req() req: UserReq,
+    @Body() urlData: ShortenUrlDTO,
+    @Log() _,
+  ) {
     try {
       const userId = req.user ? req.user.sub : null;
       const url = await this.urlService.shortenUrl({ ...urlData, userId });
@@ -48,6 +53,7 @@ export class UrlController {
   async redirectShorUrlAndCountClick(
     @Query('url') shortUrl: string,
     @Res() resp: Response,
+    @Log() _,
   ) {
     try {
       const url = await this.urlService.findAndCountClickUrl(shortUrl);
@@ -59,7 +65,7 @@ export class UrlController {
   }
 
   @Get()
-  async getActiveUrls() {
+  async getActiveUrls(@Log() _) {
     try {
       const urls = await this.urlService.listActiveUrls();
 
@@ -74,6 +80,7 @@ export class UrlController {
     @Req() req: UserReq,
     @Param('id') urlId: string,
     @Body() urlData: UpdateUrlDTO,
+    @Log() _,
   ) {
     try {
       const userId = req.user.sub;
@@ -93,7 +100,7 @@ export class UrlController {
   }
 
   @Delete(':id')
-  async DeleteResult(@Param('id') urlId: string) {
+  async DeleteResult(@Param('id') urlId: string, @Log() _) {
     try {
       await this.urlService.deleteUrl(urlId);
 

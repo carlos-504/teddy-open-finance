@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConsoleLogger,
   Inject,
   Injectable,
   NotFoundException,
@@ -20,12 +21,15 @@ export class UrlService {
     private readonly urlRepository: Repository<UrlEntity>,
     private configService: ConfigService,
     @Inject(REQUEST) private readonly req: UserReq,
+    private nativeLogger: ConsoleLogger,
   ) {}
 
   async shortenUrl(urlData: CreateOrUpdateUrlInt) {
     try {
       const { url, userId } = urlData;
+      this.nativeLogger.log('creating url...');
       const urlCreated = await this.createOrUpdateUrl({ url, userId });
+      this.nativeLogger.log('url created');
 
       return urlCreated;
     } catch (err) {
@@ -35,6 +39,7 @@ export class UrlService {
 
   async findAndCountClickUrl(shortUrl: string) {
     try {
+      this.nativeLogger.log('searching url...');
       const url = await this.urlRepository.findOne({
         where: { shortUrl, deletedAt: IsNull() },
       });
@@ -42,9 +47,12 @@ export class UrlService {
       if (!url) {
         throw new NotFoundException('url was not found');
       }
+      this.nativeLogger.log('url found');
 
+      this.nativeLogger.log('counting click...');
       url.clicks++;
       const urlUpdated = await this.urlRepository.update(url.id, url);
+      this.nativeLogger.log('click counted');
 
       if (urlUpdated.affected === 0) {
         throw new BadRequestException('unable to redirect to url');
@@ -58,6 +66,7 @@ export class UrlService {
 
   async listActiveUrls() {
     const userId = this.req.user.sub;
+    this.nativeLogger.log('searching urls...');
     const urls = await this.urlRepository.find({
       where: { deletedAt: IsNull(), userId },
     });
@@ -66,12 +75,15 @@ export class UrlService {
       throw new NotFoundException('no urls found');
     }
 
+    this.nativeLogger.log('urls found');
+
     return urls;
   }
 
   async updateUrl(urlData: CreateOrUpdateUrlInt) {
     try {
       const { id, url, userId } = urlData;
+      this.nativeLogger.log('searching url...');
       const findUrl = await this.urlRepository.findOneBy({
         id: parseInt(id),
         deletedAt: IsNull(),
@@ -81,13 +93,16 @@ export class UrlService {
       if (!findUrl) {
         throw new NotFoundException('url was not found');
       }
+      this.nativeLogger.log('url found');
 
+      this.nativeLogger.log('updating url');
       const newUrl = await this.createOrUpdateUrl({
         url,
         id,
         userId,
         clicks: findUrl.clicks,
       });
+      this.nativeLogger.log('updated url...');
 
       return newUrl;
     } catch (err) {
@@ -98,6 +113,7 @@ export class UrlService {
   async deleteUrl(urlId: string) {
     try {
       const userId = this.req.user.sub;
+      this.nativeLogger.log('searching url...');
       const url = await this.urlRepository.findOneBy({
         id: parseInt(urlId),
         deletedAt: IsNull(),
@@ -107,8 +123,11 @@ export class UrlService {
       if (!url) {
         throw new NotFoundException('url was not found');
       }
+      this.nativeLogger.log('url found');
 
+      this.nativeLogger.log('deleting url...');
       const deleteResult = await this.urlRepository.softDelete(urlId);
+      this.nativeLogger.log('deleted url');
 
       if (deleteResult.affected === 0) {
         throw new BadRequestException('unable to delete url');
