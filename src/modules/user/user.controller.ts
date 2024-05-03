@@ -2,7 +2,9 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { HashPassword } from 'src/resources/pipes/hash-password.pipe';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('USER')
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
