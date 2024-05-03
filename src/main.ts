@@ -25,6 +25,7 @@ async function bootstrap() {
       'API REST - Aplicação que encurta URLs via requisições HTTP',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
